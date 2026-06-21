@@ -1,0 +1,281 @@
+:root {
+  --page: #ffffff;
+  --ink: #202122;
+  --muted: #54595d;
+  --border: #a2a9b1;
+  --border-soft: #c8ccd1;
+  --link: #36c;
+  --green-bg: #f1fff7;
+  --green-head: #cef2e0;
+  --blue-bg: #f5faff;
+  --blue-head: #cedff2;
+  --neutral-bg: #f8f9fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--page);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus-visible {
+  text-decoration: underline;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 320px) minmax(220px, 1fr);
+  gap: 22px;
+  align-items: start;
+  padding: 10px 24px 18px;
+}
+
+.wordmark {
+  color: var(--ink);
+  display: grid;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.wordmark-main {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+}
+
+.wordmark-sub {
+  margin-top: 5px;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.72rem;
+}
+
+.account-links {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: 0.92rem;
+}
+
+.page {
+  padding: 0 24px 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border-soft);
+  margin-bottom: 16px;
+}
+
+.tabs a {
+  padding: 8px 8px 7px;
+}
+
+.tabs .active {
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 176px;
+  gap: 40px;
+  align-items: start;
+}
+
+.welcome {
+  min-height: 116px;
+  display: grid;
+  place-content: center;
+  padding: 16px;
+  border: 1px solid #ddd;
+  background: #f8f9fa;
+  text-align: center;
+}
+
+.welcome.compact {
+  min-height: 96px;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 6px;
+  font-size: clamp(1.55rem, 3vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.welcome p {
+  margin-bottom: 4px;
+}
+
+.wiki-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.work-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wiki-box {
+  border: 1px solid var(--border-soft);
+  background: var(--neutral-bg);
+}
+
+.green-box {
+  background: var(--green-bg);
+}
+
+.blue-box {
+  background: var(--blue-bg);
+}
+
+.neutral-box {
+  background: var(--neutral-bg);
+}
+
+.wiki-box h2 {
+  margin: 8px 8px 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--border-soft);
+  background: #eaecf0;
+  font-size: 1.1rem;
+  line-height: 1.35;
+}
+
+.green-box h2 {
+  background: var(--green-head);
+}
+
+.blue-box h2 {
+  background: var(--blue-head);
+}
+
+.wiki-box p,
+.wiki-box ul {
+  margin: 0 12px 12px;
+}
+
+.wiki-box ul,
+.appearance ul {
+  padding-left: 1.25rem;
+}
+
+.large-link {
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.appearance {
+  font-size: 0.9rem;
+}
+
+.appearance h2 {
+  margin: 0;
+  padding: 8px 0 9px;
+  border-bottom: 1px solid #eaecf0;
+  font-size: 0.95rem;
+}
+
+.appearance dl {
+  margin: 12px 0 0;
+}
+
+.appearance div {
+  padding: 8px 0;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.appearance dt {
+  color: var(--muted);
+}
+
+.appearance dd {
+  margin: 2px 0 0;
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 0 24px 18px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .account-links {
+    justify-content: flex-start;
+  }
+
+  .layout,
+  .wiki-grid,
+  .work-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .appearance {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar,
+  .page {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .tabs {
+    overflow-x: auto;
+  }
+
+  .welcome {
+    text-align: left;
+    place-content: start;
+  }
+}
