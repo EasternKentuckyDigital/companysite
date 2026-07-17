@@ -152,6 +152,10 @@ h1 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.full-width-box {
+  grid-column: 1 / -1;
+}
+
 .wiki-box {
   border: 1px solid var(--border-soft);
   background: var(--neutral-bg);
