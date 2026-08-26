@@ -3,84 +3,51 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta
-      name="description"
-      content="See websites made by Eastern Kentucky Digital for businesses, professionals, nonprofits, and community projects in Eastern Kentucky and beyond."
-    >
-    <title>Eastern Kentucky Web Design Portfolio | Eastern Kentucky Digital</title>
+    <meta name="description" content="Selected websites and software by Eastern Kentucky Digital.">
+    <title>Work — Eastern Kentucky Digital</title>
     <link rel="canonical" href="https://easternkentuckydigital.com/work.html">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Eastern Kentucky Digital">
-    <meta property="og:title" content="Eastern Kentucky Web Design Portfolio">
-    <meta
-      property="og:description"
-      content="Selected websites for businesses, professionals, nonprofits, and community projects."
-    >
-    <meta property="og:url" content="https://easternkentuckydigital.com/work.html">
-    <meta name="twitter:card" content="summary">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <header class="topbar">
-      <a class="wordmark" href="index.html">
-        <span class="wordmark-main">Eastern Kentucky Digital</span>
-        <span class="wordmark-sub">local websites and digital help</span>
-      </a>
-      <nav class="account-links" aria-label="Contact links">
-        <a href="mailto:rygrossmath@gmail.com">Email</a>
-      </nav>
-    </header>
-
-    <div class="page">
-      <nav class="tabs" aria-label="Primary navigation">
-        <a href="index.html">Main page</a>
-        <a class="active" href="work.html">Work</a>
-        <a href="software.html">Software</a>
-        <a href="contact.html">Contact</a>
-      </nav>
-
-      <main class="layout">
-        <section class="content">
-          <section class="welcome compact" aria-labelledby="work-title">
-            <h1 id="work-title">Eastern Kentucky web design portfolio</h1>
-            <p>A few examples of simple, useful websites built by Eastern Kentucky Digital.</p>
-          </section>
-
-          <section class="wiki-grid work-grid" aria-label="Recent projects">
-            <article class="wiki-box green-box">
-              <h2><a href="https://kragonauto.com" target="_blank" rel="noreferrer">KragonAuto.com</a></h2>
-              <p>Static inventory website for a used car dealer, including vehicle detail pages and car photos.</p>
-            </article>
-            <article class="wiki-box blue-box">
-              <h2><a href="https://teamcoltondipg.org" target="_blank" rel="noreferrer">TeamColtonDIPG.org</a></h2>
-              <p>Community nonprofit website for sharing the mission, updates, and ways to support the cause.</p>
-            </article>
-            <article class="wiki-box green-box">
-              <h2><a href="https://justbounceky.com" target="_blank" rel="noreferrer">JustBounceKY.com</a></h2>
-              <p>Local rental website for bounce houses, water slides, obstacle courses, and foam parties.</p>
-            </article>
-            <article class="wiki-box blue-box">
-              <h2><a href="https://duncanmcginnis.com" target="_blank" rel="noreferrer">DuncanMcGinnis.com</a></h2>
-              <p>Professional profile site for credibility, contact, and basic context.</p>
-            </article>
-            <article class="wiki-box green-box">
-              <h2><a href="https://rylandgross.com" target="_blank" rel="noreferrer">RylandGross.com</a></h2>
-              <p>Portfolio website for projects, background, and public links.</p>
-            </article>
-          </section>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="wordmark" href="index.html">Eastern Kentucky Digital</a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="index.html">Home</a>
+          <a href="work.html" aria-current="page">Work</a>
+          <a href="mailto:rygrossmath@gmail.com">Contact</a>
+        </nav>
+      </header>
+      <main>
+        <section class="page-intro" aria-labelledby="work-title">
+          <h1 id="work-title">Selected work.</h1>
+          <p>Simple, useful websites and software built with an emphasis on speed, clarity, maintainability, and low ongoing cost.</p>
         </section>
-
-        <aside class="appearance" aria-label="Work notes">
-          <h2>Notes</h2>
-          <p>Work is focused on speed, clarity, maintainability, and low ongoing cost.</p>
-        </aside>
+        <section class="projects-list" aria-label="Selected projects">
+          <article class="project">
+            <div><h2><a href="https://kragonauto.com" target="_blank" rel="noreferrer">KragonAuto.com</a></h2><p class="project-meta">Automotive inventory</p></div>
+            <p>A straightforward inventory site for a used car dealer, with vehicle detail pages and photos.</p>
+          </article>
+          <article class="project">
+            <div><h2><a href="https://teamcoltondipg.org" target="_blank" rel="noreferrer">TeamColtonDIPG.org</a></h2><p class="project-meta">Community nonprofit</p></div>
+            <p>A clear home for the mission, updates, and ways to support a local cause.</p>
+          </article>
+          <article class="project">
+            <div><h2><a href="https://justbounceky.com" target="_blank" rel="noreferrer">JustBounceKY.com</a></h2><p class="project-meta">Local rental business</p></div>
+            <p>A lightweight rental site for bounce houses, water slides, obstacle courses, and foam parties.</p>
+          </article>
+          <article class="project">
+            <div><h2><a href="https://dobackchess.com" target="_blank" rel="noreferrer">DoBackChess.com</a></h2><p class="project-meta">Chess training software</p></div>
+            <p>Train with your own games using analysis, reports, puzzles, and spaced review.</p>
+          </article>
+          <article class="project">
+            <div><h2><a href="https://github.com/EasternKentuckyDigital/recklesschessweb" target="_blank" rel="noreferrer">Reckless for the web</a></h2><p class="project-meta">WebAssembly / open source</p></div>
+            <p>An adaptation of the Reckless chess engine that runs locally in modern browsers.</p>
+          </article>
+        </section>
       </main>
     </div>
-
-    <footer class="site-footer">
-      <p>&copy; 2026 Eastern Kentucky Digital. All rights reserved.</p>
-      <p>Visual design inspired by Wikipedia.</p>
-    </footer>
+    <footer class="site-footer"><p><a href="index.html">Eastern Kentucky Digital</a> · <a href="mailto:rygrossmath@gmail.com">Get in touch</a></p></footer>
   </body>
 </html>
