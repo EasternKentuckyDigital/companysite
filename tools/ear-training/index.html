@@ -7,23 +7,23 @@
   <title>Ear training — Eastern Kentucky Digital</title>
   <link rel="canonical" href="https://easternkentuckydigital.com/tools/ear-training/">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <meta name="color-scheme" content="light dark">
+  <script src="../../theme.js"></script>
+  <link rel="stylesheet" href="../../styles.css">
   <link rel="stylesheet" href="styles.css">
-  <script>
-    try { const t = localStorage.getItem('theme'); document.documentElement.dataset.theme = ['light', 'dark'].includes(t) ? t : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
-    catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
-  </script>
   <script type="module" src="app.js"></script>
 </head>
-<body>
+<body class="ear-training">
+  <a class="skip-link" href="#main">Skip to content</a>
   <div class="page-shell">
     <header class="site-header">
       <a class="wordmark" href="../../index.html">Eastern Kentucky Digital</a>
       <div class="header-actions">
-        <nav aria-label="Main navigation"><a href="../../index.html">Home</a><a href="../../work.html">Work</a><a href="../" aria-current="page">Tools</a><a href="mailto:rygrossmath@gmail.com">Contact</a></nav>
-        <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Switch color theme"><span aria-hidden="true"></span></button>
+        <nav class="site-nav" aria-label="Main navigation"><a href="../../index.html">Home</a><a href="../../work.html">Work</a><a href="../" aria-current="page">Tools</a><a href="../../index.html#contact">Contact</a></nav>
+        <label class="theme-control" hidden><span>Theme</span><select data-theme-select aria-label="Color theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
       </div>
     </header>
-    <main>
+    <main id="main">
       <div class="page-heading">
         <p class="breadcrumb"><a href="../">Tools</a> <span aria-hidden="true">/</span> Music</p>
         <h1>Ear training</h1>
@@ -38,9 +38,10 @@
             <label>Playback<select id="mode"><option value="ascending">Ascending</option><option value="descending">Descending</option><option value="mixed">Ascending &amp; descending</option><option value="harmonic">Together (harmonic)</option></select></label>
             <label>Session<select id="count"><option value="10">10 questions</option><option value="20" selected>20 questions</option><option value="50">50 questions</option><option value="0">Unlimited</option></select></label>
             <label>Speed<select id="speed"><option value="slow">Slow</option><option value="normal" selected>Normal</option><option value="fast">Fast</option></select></label>
+            <label>Root note<select id="root-note"><option value="60" selected>Middle C (C4)</option><option value="59">B3</option><option value="58">B♭3</option><option value="57">A3</option><option value="56">A♭3</option><option value="55">G3</option><option value="varied">Varied notes</option></select></label>
           </div>
           <fieldset class="interval-options"><legend>Choose intervals</legend><div id="interval-options"></div></fieldset>
-          <div class="settings-checks"><label><input type="checkbox" id="fixed-root"> Keep the lower note at G3</label><label><input type="checkbox" id="auto-next"> Auto advance after 4 seconds</label></div>
+          <div class="settings-checks"><label><input type="checkbox" id="auto-next"> Auto advance after the demonstration</label><span class="root-note-help">The root is the lower note; descending intervals play the upper note first.</span></div>
           <div class="settings-footer"><p id="settings-note">Settings are saved in this browser.</p><button class="button" type="submit" id="apply-settings">Apply settings</button></div>
           <p id="settings-error" role="alert" hidden></p>
         </form>
@@ -54,7 +55,7 @@
             <button id="primary" class="button primary" type="button"><span class="play-icon" aria-hidden="true">▶</span><span id="primary-label">Start practice</span></button>
             <button id="replay" class="button" type="button" disabled>Replay <kbd>R</kbd></button>
             <button id="reveal" class="text-button" type="button" disabled>Reveal answer</button>
-            <label class="volume-control"><span>Volume</span><input id="volume" type="range" min="0" max="100" value="60" aria-label="Volume"></label>
+            <label class="volume-control"><span>Volume</span><input id="volume" type="range" min="0" max="100" value="80" aria-label="Volume"></label>
           </div>
           <div id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">Start practice to hear two notes, then choose the interval.</div>
           <div id="answers" class="answers" role="group" aria-label="Choose the interval"></div>
@@ -68,11 +69,16 @@
           <div class="instrument-heading"><h2 id="instrument-title">On the piano</h2><div class="instrument-tabs" role="group" aria-label="Instrument visualization"><button type="button" data-instrument="piano" aria-pressed="true">Piano</button><button type="button" data-instrument="guitar" aria-pressed="false">Guitar <small>beta</small></button><button type="button" data-instrument="violin" aria-pressed="false">Violin <small>beta</small></button><button type="button" data-instrument="mandolin" aria-pressed="false">Mandolin <small>beta</small></button></div></div>
           <div class="visual-caption"><p id="visual-explanation">The notes appear after a correct answer or reveal.</p><div id="note-legend" class="note-legend" hidden><span><i class="first-dot"></i><span id="first-note"></span></span><span><i class="second-dot"></i><span id="second-note"></span></span></div></div>
           <div id="instrument" class="instrument" aria-label="Instrument visualization"></div>
-          <div class="instrument-footer"><span id="instrument-note">Two octaves · C3–C5 · 25 keys</span><button id="replay-slow" class="text-button" type="button" hidden>Hear slowly</button></div>
+          <div id="demonstration" class="demonstration" hidden>
+            <div class="demonstration-steps"><button type="button" id="demo-first" class="note-step"></button><span id="demo-direction" aria-hidden="true">→</span><button type="button" id="demo-second" class="note-step"></button><span id="demo-interval" class="demo-interval"></span></div>
+            <p id="fingering-guide"></p>
+          </div>
+          <div class="instrument-footer"><span id="instrument-note">Two octaves · C3–C5 · 25 keys</span><button id="replay-slow" class="text-button" type="button" hidden>Play demonstration slowly</button></div>
+          <p id="sample-status" class="sample-status" role="status" aria-live="polite"></p>
         </div>
         <div class="session-footer"><span><kbd>Space</kbd> start / next &nbsp; <kbd>R</kbd> replay &nbsp; <kbd>1</kbd>–<kbd id="last-shortcut">4</kbd> answer</span><button id="end-session" class="text-button" type="button" hidden>End session</button></div>
       </section>
-      <details class="help"><summary>How to practice</summary><p>Listen to the distance between the notes, then choose its name. Start with four intervals and add more in Practice settings when you feel comfortable. All notes use the same piano sound so you can focus on pitch.</p><p>A correct answer reveals both notes. Click the keyboard or highlighted string positions to play them, or choose Hear slowly. Wrong guesses let you try again; your score counts answers on the first try. Revealed answers count as missed.</p><p>Each view shows the exact pitches you heard. Guitar uses standard E–A–D–G–B–E tuning; violin and mandolin use G–D–A–E. On violin, dashed lines are semitone guides on an unfretted fingerboard.</p><p>Inspired by the interval exercises at <a href="https://tonedear.com/ear-training/intervals" target="_blank" rel="noreferrer">TonedEar</a>. A few minutes of regular practice goes a long way.</p></details>
+      <details class="help"><summary>How to practice</summary><p>Listen to the distance between the notes, then choose its name. Middle C is the default root. Change Root note in Practice settings to choose another anchor or vary the notes.</p><p>Each instrument uses recordings of that instrument. Select the instrument you want to hear before starting, or switch during practice to compare the same interval.</p><p>A correct answer or reveal plays a slow demonstration, with each note lighting up as it sounds. On strings, solid markers show one suggested playable path; outlined markers show other places to find the same pitches. Click a note to hear it on its own.</p><p>Wrong guesses let you try again; your score counts answers on the first try. Revealed answers count as missed. Guitar uses E–A–D–G–B–E tuning; violin and mandolin use G–D–A–E. Violin’s dashed lines are semitone guides rather than frets.</p><p id="audio-credits">Public-domain (CC0) recordings: <a href="https://versilian-studios.com/vcsl/">Kawai piano</a> and <a href="https://versilian-studios.com/vsco-community/">violin</a> by Versilian Studios, <a href="https://freepats.zenvoid.org/Guitar/acoustic-guitar.html">classical guitar</a> by Roberto / FreePats, and <a href="https://freesound.org/people/Taku19810729/sounds/255837/">mandolin</a> by Taku19810729.</p><p>Inspired by <a href="https://tonedear.com/ear-training/intervals" target="_blank" rel="noreferrer">TonedEar</a>.</p></details>
       <noscript><p class="no-script">JavaScript is needed to play audio and run this ear trainer. Please enable it in your browser.</p></noscript>
     </main>
     <footer class="site-footer"><span>Free to use. No account needed.</span><a href="../../index.html">Eastern Kentucky Digital</a></footer>

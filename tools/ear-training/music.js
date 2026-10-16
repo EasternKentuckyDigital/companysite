@@ -21,7 +21,7 @@ export const INSTRUMENTS = Object.freeze({
 });
 export const DEFAULT_SETTINGS = Object.freeze({
   intervals: PRESETS.beginner, mode: "ascending", count: 20, speed: "normal",
-  fixedRoot: false, autoNext: false, instrument: "piano", volume: 0.6,
+  rootNote: 60, autoNext: false, instrument: "piano", volume: 0.8,
 });
 const PITCH_NAMES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
 export const noteName = midi => `${PITCH_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
@@ -38,9 +38,12 @@ export function normalizeSettings(input = {}) {
     mode: ["ascending", "descending", "mixed", "harmonic"].includes(input.mode) ? input.mode : "ascending",
     count: [0, 10, 20, 50].includes(input.count) ? input.count : 20,
     speed: ["slow", "normal", "fast"].includes(input.speed) ? input.speed : "normal",
-    fixedRoot: input.fixedRoot === true, autoNext: input.autoNext === true,
+    rootNote: input.rootNote === null ? null
+      : Number.isInteger(input.rootNote) && input.rootNote >= 55 && input.rootNote <= 60 ? input.rootNote
+      : input.fixedRoot === true ? 55 : 60,
+    autoNext: input.autoNext === true,
     instrument: Object.hasOwn(INSTRUMENTS, input.instrument) ? input.instrument : "piano",
-    volume: typeof input.volume === "number" && Number.isFinite(input.volume) ? Math.max(0, Math.min(1, input.volume)) : 0.6,
+    volume: typeof input.volume === "number" && Number.isFinite(input.volume) ? Math.max(0, Math.min(1, input.volume)) : 0.8,
   };
 }
 
@@ -52,7 +55,7 @@ export function createQuestion(settings, previous = null, random = Math.random) 
   const mode = options.mode === "mixed" ? (random() < 0.5 ? "ascending" : "descending") : options.mode;
   const candidates = [];
   for (let low = 55; low <= 72 - semitones; low++) {
-    if (options.fixedRoot && low !== 55) continue;
+    if (options.rootNote !== null && low !== options.rootNote) continue;
     const notes = mode === "descending" ? [low + semitones, low] : [low, low + semitones];
     candidates.push({ semitones, mode, notes });
   }
@@ -68,6 +71,19 @@ export function stringPositions(instrument, midi) {
     const fret = midi - open;
     return fret >= 0 && fret <= config.frets ? [{ string, fret, midi }] : [];
   });
+}
+
+// Favor one string when practical, then short shifts and nearby strings.
+// Other valid positions remain visible as alternatives, rather than competing paths.
+export function suggestedPositions(instrument, notes) {
+  if (!Array.isArray(notes) || notes.length !== 2) return [];
+  const pairs = stringPositions(instrument, notes[0]).flatMap(first =>
+    stringPositions(instrument, notes[1]).map(second => [first, second]));
+  const score = ([first, second]) => Math.abs(first.fret - second.fret) * 2
+    + Math.abs(first.string - second.string) * 3
+    + Math.max(first.fret, second.fret) * .2
+    - (first.string === second.string ? 12 : 0);
+  return pairs.sort((a, b) => score(a) - score(b))[0] ?? [];
 }
 
 export function newSession() {

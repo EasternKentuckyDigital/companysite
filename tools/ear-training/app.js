@@ -1,12 +1,13 @@
-import { INTERVALS, PRESETS, INSTRUMENTS, normalizeSettings, createQuestion, noteName, isBlackKey, intervalBy, stringPositions, newSession, recordResult } from './music.js';
-import { PianoAudio } from './audio.js';
+import { INTERVALS, PRESETS, INSTRUMENTS, normalizeSettings, createQuestion, noteName, isBlackKey, intervalBy, stringPositions, suggestedPositions, newSession, recordResult } from './music.js';
+import { InstrumentAudio } from './audio.js';
+import { SAMPLE_INSTRUMENTS } from './samples.js';
 
 const $ = id => document.getElementById(id);
 const STORAGE_KEY = 'ekd-ear-training-v1';
 let settings;
 try { settings = normalizeSettings(JSON.parse(localStorage.getItem(STORAGE_KEY))); }
 catch { settings = normalizeSettings(); }
-const audio = new PianoAudio();
+const audio = new InstrumentAudio();
 audio.setVolume(settings.volume);
 let session = newSession();
 let question = null;
@@ -18,7 +19,6 @@ let audioToken = 0;
 let autoTimer = null;
 let animationTimers = [];
 let playbackFailed = false;
-const playedTimers = new Set();
 
 function saveSettings() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch { /* Private browsing may disable storage. */ }
@@ -44,13 +44,13 @@ function stopPlayback() {
 }
 function updateSettingsDescription() {
   const modes = { ascending: 'ascending', descending: 'descending', mixed: 'both directions', harmonic: 'together' };
-  $('settings-description').textContent = `${settings.intervals.length} intervals · ${modes[settings.mode]} · ${settings.count ? `${settings.count} questions` : 'unlimited'}`;
+  $('settings-description').textContent = `${settings.intervals.length} intervals · ${settings.rootNote === null ? 'varied roots' : noteName(settings.rootNote)} · ${modes[settings.mode]} · ${settings.count ? `${settings.count} questions` : 'unlimited'}`;
   $('apply-settings').textContent = phase === 'asking' || phase === 'answered' ? 'Apply & restart session' : 'Apply settings';
 }
 function fillSettings() {
   $('preset').value = presetFor(settings.intervals);
   for (const id of ['mode', 'count', 'speed']) $(id).value = String(settings[id]);
-  $('fixed-root').checked = settings.fixedRoot;
+  $('root-note').value = settings.rootNote === null ? 'varied' : String(settings.rootNote);
   $('auto-next').checked = settings.autoNext;
   $('volume').value = settings.volume * 100;
   $('interval-options').replaceChildren(...INTERVALS.map(interval => {
@@ -72,7 +72,7 @@ function renderAnswers() {
     button.type = 'button';
     button.className = 'answer';
     button.dataset.interval = semitones;
-    button.disabled = phase !== 'asking' || attempted.has(semitones);
+    button.disabled = phase !== 'asking' || playing || attempted.has(semitones);
     const name = document.createElement('strong');
     name.textContent = interval.name;
     const short = document.createElement('span');
@@ -118,8 +118,9 @@ function renderControls() {
   $('primary-label').textContent = phase === 'ready' ? 'Start practice' : phase === 'asking' ? (playing ? 'Playing…' : 'Hear again') : settings.count && session.answered >= settings.count ? 'See results' : 'Next interval';
   $('primary').disabled = phase === 'asking' && playing;
   $('replay').disabled = !question || playing;
-  $('reveal').disabled = phase !== 'asking';
+  $('reveal').disabled = phase !== 'asking' || playing;
   $('replay-slow').hidden = phase !== 'answered' && !(phase === 'summary' && question);
+  $('replay-slow').disabled = playing;
   $('end-session').hidden = phase === 'ready' || phase === 'summary';
   $('settings-note').textContent = phase === 'asking' || phase === 'answered' ? 'Applying changes starts a new session.' : 'Settings are saved in this browser.';
   updateSettingsDescription();
@@ -128,18 +129,30 @@ function noteRole(midi) {
   if (!question || (phase !== 'answered' && phase !== 'summary')) return -1;
   return question.notes.indexOf(midi);
 }
-function activateNote(midi) {
+async function activateNote(midi) {
+  if (phase === 'asking') return;
   clearAuto();
   stopPlayback();
+  const token = audioToken;
+  playing = true;
   renderControls();
-  audio.playNote(midi).catch(error => feedback(error.message, 'missed'));
-  const elements = document.querySelectorAll(`[data-midi="${midi}"]`);
-  elements.forEach(el => el.classList.add('sounding'));
-  const timer = setTimeout(() => {
-    elements.forEach(el => el.classList.remove('sounding'));
-    playedTimers.delete(timer);
-  }, 500);
-  playedTimers.add(timer);
+  $('sample-status').textContent = `Loading ${SAMPLE_INSTRUMENTS[settings.instrument].name.toLowerCase()} recording…`;
+  try {
+    const result = await audio.playNote(midi, settings.instrument);
+    if (token !== audioToken || !result) return;
+    $('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
+    animateNote(midi, result.delay * 1000, token, result.duration * 1000);
+    animationTimers.push(setTimeout(() => {
+      if (token !== audioToken) return;
+      playing = false;
+      renderControls();
+    }, (result.delay + result.duration) * 1000));
+  } catch (error) {
+    if (token !== audioToken) return;
+    playing = false;
+    $('sample-status').textContent = error.message;
+    renderControls();
+  }
 }
 function renderPiano() {
   const piano = document.createElement('div');
@@ -199,6 +212,9 @@ function renderStrings() {
   const left = 76, right = 818, top = 40, bottom = 167;
   const x = fret => left + (right - left) * (1 - 2 ** (-fret / 12)) * 2;
   const y = string => bottom - string / (config.tuning.length - 1) * (bottom - top);
+  const markerX = position => position.fret === 0 ? left - 27 : config.fretless ? x(position.fret) : (x(position.fret) + x(position.fret - 1)) / 2;
+  const visible = question && (phase === 'answered' || phase === 'summary');
+  const path = visible ? suggestedPositions(settings.instrument, question.notes) : [];
   svg.append(svgElement('rect', { x: left, y: top - 16, width: right - left, height: bottom - top + 32, rx: 2, class: 'board' }));
   for (let fret = 0; fret <= 12; fret++) {
     svg.append(svgElement('line', { x1: x(fret), x2: x(fret), y1: top - 16, y2: bottom + 16, class: fret === 0 ? 'nut' : `fret${config.fretless ? ' guide' : ''}` }));
@@ -216,14 +232,16 @@ function renderStrings() {
     svg.append(svgElement('text', { x: 28, y: y(string) + 4, 'text-anchor': 'middle', class: 'string-label' }, noteName(open)));
     for (const offset of config.doubled ? [-2, 2] : [0]) svg.append(svgElement('line', { x1: left - 35, x2: right, y1: y(string) + offset, y2: y(string) + offset, class: 'string', 'stroke-width': config.doubled ? 1 : 1 + (config.tuning.length - 1 - string) * .22 }));
   });
-  if (question && (phase === 'answered' || phase === 'summary')) {
+  if (visible) {
+    if (path.length === 2) svg.append(svgElement('line', { x1: markerX(path[0]), y1: y(path[0].string), x2: markerX(path[1]), y2: y(path[1].string), class: 'suggested-path', 'aria-hidden': 'true' }));
     question.notes.forEach((midi, role) => {
       for (const position of stringPositions(settings.instrument, midi)) {
         // On a fretless instrument the finger stops the string at the pitch
         // position itself. Fretted instruments show the finger behind the fret.
-        const cx = position.fret === 0 ? left - 27 : config.fretless ? x(position.fret) : (x(position.fret) + x(position.fret - 1)) / 2;
+        const cx = markerX(position);
         const cy = y(position.string);
-        const marker = svgElement('g', { class: `note-position ${role === 0 ? 'note-first' : 'note-second'}`, role: 'button', tabindex: '0', 'aria-label': `Play ${noteName(midi)}, note ${role + 1}, ${noteName(config.tuning[position.string])} string, ${position.fret === 0 ? 'open' : `${config.fretless ? 'semitone' : 'fret'} ${position.fret}`}`, 'data-midi': midi });
+        const primary = path[role]?.string === position.string && path[role]?.fret === position.fret;
+        const marker = svgElement('g', { class: `note-position ${role === 0 ? 'note-first' : 'note-second'}${primary ? ' primary-position' : ' alternate-position'}`, role: 'button', tabindex: '0', 'aria-label': `Play ${noteName(midi)}, note ${role + 1}, ${noteName(config.tuning[position.string])} string, ${position.fret === 0 ? 'open' : `${config.fretless ? 'semitone' : 'fret'} ${position.fret}`}`, 'data-midi': midi, 'data-primary': String(primary) });
         marker.append(svgElement('circle', { cx, cy, r: 15 }), svgElement('text', { x: cx, y: cy + 1 }, `${role + 1}`));
         marker.addEventListener('click', () => activateNote(midi));
         marker.addEventListener('keydown', event => {
@@ -242,10 +260,21 @@ function renderInstrument() {
   $('instrument-title').textContent = `On the ${instrument}`;
   const visible = question && (phase === 'answered' || phase === 'summary');
   $('note-legend').hidden = !visible;
+  $('demonstration').hidden = !visible;
   if (visible) {
     const together = question.mode === 'harmonic';
     $('first-note').textContent = `${together ? 'Lower' : 'First'}: ${noteName(question.notes[0])}`;
     $('second-note').textContent = `${together ? 'Upper' : 'Second'}: ${noteName(question.notes[1])}`;
+    const path = suggestedPositions(instrument, question.notes);
+    for (const [index, id] of ['demo-first', 'demo-second'].entries()) {
+      const button = $(id);
+      button.dataset.midi = question.notes[index];
+      button.textContent = `${together ? (index === 0 ? 'Lower' : 'Upper') : (index === 0 ? '1' : '2')} · ${noteName(question.notes[index])}`;
+    }
+    $('demo-direction').textContent = together ? '+' : '→';
+    $('demo-interval').textContent = `${intervalBy(question.semitones).name} · ${question.semitones} semitones`;
+    $('fingering-guide').textContent = instrument === 'piano' ? 'Follow the highlighted keys, or select either note to hear it again.'
+      : path.map((position, index) => `${index + 1}: ${noteName(INSTRUMENTS[instrument].tuning[position.string])} string, ${position.fret === 0 ? 'open' : `${INSTRUMENTS[instrument].fretless ? 'position' : 'fret'} ${position.fret}`}`).join(' → ') + '. Solid markers show this path; outlined markers are alternatives.';
     $('visual-explanation').textContent = `${question.notes.map(noteName).join(together ? ' + ' : ' → ')} · ${question.semitones} semitone${question.semitones === 1 ? '' : 's'}`;
   } else {
     $('visual-explanation').textContent = 'The notes appear after a correct answer or reveal.';
@@ -266,15 +295,16 @@ function render() {
   renderAnswers();
   renderInstrument();
 }
-function animateNote(midi, delay, token) {
+function animateNote(midi, delay, token, duration = 650) {
+  const selector = `.piano-key[data-midi="${midi}"], .note-step[data-midi="${midi}"], .note-position[data-midi="${midi}"][data-primary="true"]`;
   animationTimers.push(setTimeout(() => {
     if (token !== audioToken) return;
-    document.querySelectorAll(`[data-midi="${midi}"]`).forEach(el => el.classList.add('sounding'));
+    document.querySelectorAll(selector).forEach(el => el.classList.add('sounding'));
   }, delay));
   animationTimers.push(setTimeout(() => {
     if (token !== audioToken) return;
-    document.querySelectorAll(`[data-midi="${midi}"]`).forEach(el => el.classList.remove('sounding'));
-  }, delay + 500));
+    document.querySelectorAll(selector).forEach(el => el.classList.remove('sounding'));
+  }, delay + duration));
 }
 async function playQuestion(speed = settings.speed) {
   if (!question) return;
@@ -283,26 +313,33 @@ async function playQuestion(speed = settings.speed) {
   const currentQuestion = question;
   playing = true;
   renderControls();
+  renderAnswers();
+  $('sample-status').textContent = `Loading ${SAMPLE_INSTRUMENTS[settings.instrument].name.toLowerCase()} recordings…`;
   try {
-    const result = await audio.play(currentQuestion, speed);
+    const result = await audio.play(currentQuestion, speed, settings.instrument);
     if (token !== audioToken || !result) return;
     playbackFailed = false;
+    $('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
     if (phase === 'asking') feedback('Which interval did you hear?');
     if (phase === 'answered' || phase === 'summary') {
-      animateNote(currentQuestion.notes[0], 35, token);
-      animateNote(currentQuestion.notes[1], result.gap * 1000 + 35, token);
+      animateNote(currentQuestion.notes[0], result.delay * 1000, token, result.durations[0] * 1000);
+      animateNote(currentQuestion.notes[1], (result.delay + result.gap) * 1000, token, result.durations[1] * 1000);
     }
     animationTimers.push(setTimeout(() => {
       if (token !== audioToken) return;
       playing = false;
       renderControls();
+      renderAnswers();
+      if (phase === 'answered' && settings.autoNext) autoTimer = setTimeout(nextQuestion, 4000);
     }, result.duration * 1000));
   } catch (error) {
     if (token !== audioToken) return;
     playing = false;
     playbackFailed = true;
     feedback(error.message, 'missed');
+    $('sample-status').textContent = error.message;
     renderControls();
+    renderAnswers();
   }
 }
 function nextQuestion() {
@@ -326,7 +363,7 @@ function startSession() {
   nextQuestion();
 }
 function answer(semitones, reveal = false) {
-  if (phase !== 'asking' || (!reveal && attempted.has(semitones))) return;
+  if (phase !== 'asking' || playing || (!reveal && attempted.has(semitones))) return;
   if (playbackFailed && !reveal) { feedback('Press Replay to hear the interval before answering.', 'missed'); return; }
   if (!reveal && semitones !== question.semitones) {
     missed = true;
@@ -343,8 +380,7 @@ function answer(semitones, reveal = false) {
   const mode = { ascending: 'ascending', descending: 'descending', harmonic: 'together' }[question.mode];
   feedback(reveal ? `${name} (${mode}). Listen again and compare the notes below.` : `${missed ? 'That’s it' : 'Correct'} — ${name.toLowerCase()} (${mode}).`, reveal ? '' : 'success');
   render();
-  // Completing a question never hides its visualization immediately.
-  if (settings.autoNext) autoTimer = setTimeout(nextQuestion, 4000);
+  playQuestion('slow');
 }
 function finishSession() {
   clearAuto();
@@ -404,7 +440,7 @@ $('settings-form').addEventListener('submit', event => {
   }
   $('settings-error').hidden = true;
   const active = phase === 'asking' || phase === 'answered';
-  settings = normalizeSettings({ ...settings, intervals, mode: $('mode').value, count: Number($('count').value), speed: $('speed').value, fixedRoot: $('fixed-root').checked, autoNext: $('auto-next').checked });
+  settings = normalizeSettings({ ...settings, intervals, mode: $('mode').value, count: Number($('count').value), speed: $('speed').value, rootNote: $('root-note').value === 'varied' ? null : Number($('root-note').value), autoNext: $('auto-next').checked });
   saveSettings();
   clearAuto();
   $('settings').open = false;
@@ -415,25 +451,17 @@ $('settings-form').addEventListener('submit', event => {
   }
 });
 document.querySelectorAll('[data-instrument]').forEach(button => button.addEventListener('click', () => {
-  settings.instrument = button.dataset.instrument;
   clearAuto();
+  stopPlayback();
+  settings.instrument = button.dataset.instrument;
   saveSettings();
   renderInstrument();
+  renderControls();
+  if (question) playQuestion(phase === 'asking' ? settings.speed : 'slow');
+  else $('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
 }));
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  $('theme-toggle').setAttribute('aria-checked', String(theme === 'dark'));
-  $('theme-toggle').setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
-}
-$('theme-toggle').addEventListener('click', () => {
-  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  try { localStorage.setItem('theme', theme); } catch { /* The current visit still changes theme. */ }
-  applyTheme(theme);
-});
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-  let stored; try { stored = localStorage.getItem('theme'); } catch { /* Use the system theme. */ }
-  if (!['light', 'dark'].includes(stored)) applyTheme(event.matches ? 'dark' : 'light');
-});
+for (const id of ['demo-first', 'demo-second']) $(id).addEventListener('click', () => activateNote(Number($(id).dataset.midi)));
+
 document.addEventListener('keydown', event => {
   if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
   const target = event.target;
@@ -449,8 +477,8 @@ document.addEventListener('keydown', event => {
     if (index >= 0 && phase === 'asking' && settings.intervals[index] != null) { event.preventDefault(); answer(settings.intervals[index]); }
   }
 });
-document.addEventListener('visibilitychange', () => { if (document.hidden) { clearAuto(); stopPlayback(); renderControls(); } });
-window.addEventListener('pagehide', () => { clearAuto(); stopPlayback(); for (const timer of playedTimers) clearTimeout(timer); });
-applyTheme(document.documentElement.dataset.theme || 'light');
+document.addEventListener('visibilitychange', () => { if (document.hidden) { clearAuto(); stopPlayback(); renderControls(); renderAnswers(); } });
+window.addEventListener('pagehide', () => { clearAuto(); stopPlayback(); });
+$('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
 fillSettings();
 render();

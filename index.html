@@ -3,46 +3,48 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Affordable websites, hosting, computer help, and practical digital services from Eastern Kentucky Digital.">
-    <title>Eastern Kentucky Digital</title>
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="Websites, hosting, software, and practical computer help for small businesses, nonprofits, and individuals. Eastern Kentucky Digital, by Ryland Gross.">
+    <title>Eastern Kentucky Digital — Websites &amp; digital help</title>
     <link rel="canonical" href="https://easternkentuckydigital.com/">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css">
     <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="contact.js" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <div class="page-shell">
       <header class="site-header">
         <a class="wordmark" href="index.html">Eastern Kentucky Digital</a>
-        <div class="header-actions"><nav class="site-nav" aria-label="Main navigation">
-          <a href="index.html" aria-current="page">Home</a>
-          <a href="work.html">Work</a>
-          <a href="tools/">Tools</a>
-          <a href="mailto:rygrossmath@gmail.com">Contact</a>
-        </nav><button class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Switch color theme"><span class="theme-toggle-thumb" aria-hidden="true"></span></button></div>
+        <div class="header-actions">
+          <nav class="site-nav" aria-label="Main navigation"><a href="index.html" aria-current="page">Home</a><a href="work.html">Work</a><a href="tools/">Tools</a><a href="#contact">Contact</a></nav>
+          <label class="theme-control" hidden><span>Theme</span><select data-theme-select aria-label="Color theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+        </div>
       </header>
-      <main>
-        <section class="intro" aria-label="About Eastern Kentucky Digital">
-          <p>Websites, software, and practical computer help, by <a href="https://rylandgross.com">Ryland Gross</a>.</p>
-          <p>I work with small businesses, nonprofits, and individuals, from a simple website to hosting, updates, and custom tools.</p>
-          <dl class="contact-list">
-            <div><dt>Email</dt><dd><a href="mailto:rygrossmath@gmail.com">rygrossmath[at]gmail.com</a></dd></div>
+      <main id="main">
+        <section aria-labelledby="intro-title">
+          <p class="eyebrow">Independent. Personal. Practical.</p>
+          <h1 id="intro-title">Websites and practical<br>digital help.</h1>
+          <p class="intro-copy">I’m <a href="https://rylandgross.com">Ryland Gross</a>. I run Eastern Kentucky Digital, helping small businesses, nonprofits, and individuals get things working on the web and on their computers.</p>
+          <div class="intro-actions"><a class="button" href="#contact">Get in touch <span aria-hidden="true">↗</span></a><a class="text-link" href="work.html">See client work <span aria-hidden="true">→</span></a></div>
+        </section>
+        <section class="home-section" aria-labelledby="services-title">
+          <h2 id="services-title">How I can help</h2>
+          <dl class="service-list">
+            <div><dt>Websites</dt><dd>Simple, useful sites for your business or organization, built to work on phones and computers.</dd></div>
+            <div><dt>Hosting &amp; upkeep</dt><dd>A place for your site to live, with help keeping it updated and working.</dd></div>
+            <div><dt>Software &amp; computer help</dt><dd>Custom tools, technical troubleshooting, and a hand with the digital work that gets in your way.</dd></div>
           </dl>
         </section>
-        <section class="home-section" aria-labelledby="tools-title">
-          <h2 id="tools-title"><a href="tools/">Tools</a></h2>
-          <ul class="link-list">
-            <li><a href="tools/ear-training/">Ear training</a> <span>— hear intervals, then see them on your instrument.</span></li>
-            <li><a href="https://graphtotex.com">GraphToTeX</a> <span>— graphing and diagrams with TikZ export.</span></li>
-          </ul>
-          <p class="small-note">Free to use. No account needed.</p>
-        </section>
-        <section class="home-section" aria-labelledby="work-title">
-          <h2 id="work-title"><a href="work.html">Selected work</a></h2>
-          <p>Websites for local businesses, community projects, and independent software.</p>
+        <section class="contact-section" id="contact" aria-labelledby="contact-title">
+          <div><h2 id="contact-title">Have something in mind?</h2><p>Tell me what you’re working on and where you could use a hand. You’ll be talking directly with me.</p></div>
+          <button class="button" type="button" id="reveal-contact" aria-controls="contact-details" hidden>Show email address <span aria-hidden="true">↗</span></button>
+          <div class="contact-details" id="contact-details" hidden></div>
+          <noscript><p>Enable JavaScript to reveal my email address, or find me through <a href="https://rylandgross.com">my personal website</a>.</p></noscript>
         </section>
       </main>
     </div>
-    <footer class="site-footer"><p>&copy; 2026 Eastern Kentucky Digital.</p></footer>
+    <footer class="site-footer"><p>&copy; 2026 Eastern Kentucky Digital · By Ryland Gross</p><a href="tools/">Free tools <span aria-hidden="true">↗</span></a></footer>
   </body>
 </html>

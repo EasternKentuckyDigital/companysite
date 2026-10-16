@@ -1,18 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { INTERVALS, INSTRUMENTS, normalizeSettings, createQuestion, stringPositions, noteName, frequency, isBlackKey, newSession, recordResult } from '../tools/ear-training/music.js';
+import { INTERVALS, INSTRUMENTS, normalizeSettings, createQuestion, stringPositions, suggestedPositions, noteName, frequency, isBlackKey, newSession, recordResult } from '../tools/ear-training/music.js';
 
 test('all interval, direction, and root combinations produce exact pitches playable on every instrument', () => {
-  for (const interval of INTERVALS) for (const mode of ['ascending', 'descending', 'mixed', 'harmonic']) for (const fixedRoot of [false, true]) {
+  for (const interval of INTERVALS) for (const mode of ['ascending', 'descending', 'mixed', 'harmonic']) for (const rootNote of [null, 55, 56, 57, 58, 59, 60]) {
     for (let seed = 0; seed < 40; seed++) {
       let step = seed;
       const random = () => ((step++ * 137 + 53) % 997) / 997;
-      const question = createQuestion({ intervals: [interval.semitones], mode, fixedRoot }, null, random);
+      const question = createQuestion({ intervals: [interval.semitones], mode, rootNote }, null, random);
       assert.equal(Math.abs(question.notes[1] - question.notes[0]), interval.semitones);
       assert.equal(question.semitones, interval.semitones);
       if (question.mode === 'descending') assert.ok(question.notes[0] > question.notes[1]);
       else assert.ok(question.notes[0] < question.notes[1]);
-      if (fixedRoot) assert.equal(Math.min(...question.notes), 55);
+      if (rootNote !== null) assert.equal(Math.min(...question.notes), rootNote);
       for (const midi of question.notes) {
         assert.ok(midi >= INSTRUMENTS.piano.low && midi <= INSTRUMENTS.piano.high);
         for (const instrument of ['guitar', 'violin', 'mandolin']) {
@@ -26,11 +26,11 @@ test('all interval, direction, and root combinations produce exact pitches playa
 });
 
 test('generation avoids repeating the exact notes and direction when alternatives exist', () => {
-  const settings = { intervals: [7], mode: 'ascending' };
+  const settings = { intervals: [7], mode: 'ascending', rootNote: null };
   const first = createQuestion(settings, null, () => 0);
   const second = createQuestion(settings, first, () => 0);
   assert.notDeepEqual(first.notes, second.notes);
-  const fixed = { ...settings, fixedRoot: true };
+  const fixed = { ...settings, rootNote: 55 };
   assert.deepEqual(createQuestion(fixed, createQuestion(fixed), () => 0).notes, [55, 62]);
 });
 
@@ -53,7 +53,30 @@ test('stored settings tolerate invalid JSON values and do not permit invalid not
   assert.deepEqual(settings.intervals, [3, 12]);
   assert.equal(settings.volume, 0);
   assert.equal(settings.count, 20);
-  assert.equal(settings.fixedRoot, false);
+  assert.equal(settings.rootNote, 60);
+});
+
+test('middle C and 80 percent volume are defaults, selected roots persist, and old fixed roots migrate', () => {
+  assert.equal(normalizeSettings().rootNote, 60);
+  assert.equal(normalizeSettings().volume, .8);
+  for (const rootNote of [null, 55, 56, 57, 58, 59, 60]) assert.equal(normalizeSettings({ rootNote }).rootNote, rootNote);
+  for (const rootNote of [false, '60', 40, 61, NaN, Infinity]) assert.equal(normalizeSettings({ rootNote }).rootNote, 60);
+  assert.equal(normalizeSettings({ fixedRoot: true }).rootNote, 55);
+  assert.equal(normalizeSettings({ fixedRoot: false }).rootNote, 60);
+  for (const interval of INTERVALS) assert.equal(createQuestion({ intervals: [interval.semitones] }).notes[0], 60);
+});
+
+test('suggested string paths are playable and follow playback order in both directions', () => {
+  for (const instrument of ['guitar', 'violin', 'mandolin']) for (const interval of INTERVALS) for (const mode of ['ascending', 'descending']) {
+    const question = createQuestion({ intervals: [interval.semitones], mode });
+    const path = suggestedPositions(instrument, question.notes);
+    assert.equal(path.length, 2);
+    path.forEach((position, i) => {
+      assert.equal(position.midi, question.notes[i]);
+      assert.equal(INSTRUMENTS[instrument].tuning[position.string] + position.fret, question.notes[i]);
+      assert.ok(position.fret >= 0 && position.fret <= 12);
+    });
+  }
 });
 
 test('pitch names and tuning use scientific pitch notation and A4 = 440 Hz', () => {

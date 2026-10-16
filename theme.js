@@ -1,27 +1,34 @@
 (() => {
   const root = document.documentElement;
-  const preference = matchMedia("(prefers-color-scheme: dark)");
-  const storedTheme = () => {
-    try { return localStorage.getItem("theme"); } catch { return null; }
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const validPreference = value => ["light", "dark"].includes(value) ? value : "system";
+  let preference;
+  try { preference = validPreference(localStorage.getItem("theme")); }
+  catch { preference = "system"; }
+  const apply = () => {
+    root.dataset.theme = preference === "system" ? (system.matches ? "dark" : "light") : preference;
+    document.querySelectorAll("[data-theme-select]").forEach(select => { select.value = preference; });
   };
-  const apply = (theme) => {
-    root.dataset.theme = theme === "dark" ? "dark" : "light";
-    const button = document.querySelector(".theme-toggle");
-    if (button) {
-      button.setAttribute("aria-checked", String(theme === "dark"));
-      button.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
-    }
-  };
-  apply(["light", "dark"].includes(storedTheme()) ? storedTheme() : preference.matches ? "dark" : "light");
+  apply();
   document.addEventListener("DOMContentLoaded", () => {
-    apply(root.dataset.theme);
-    document.querySelector(".theme-toggle")?.addEventListener("click", () => {
-      const theme = root.dataset.theme === "dark" ? "light" : "dark";
-      try { localStorage.setItem("theme", theme); } catch { /* Theme still works without storage. */ }
-      apply(theme);
+    document.querySelectorAll("[data-theme-select]").forEach(select => {
+      select.closest(".theme-control").hidden = false;
+      select.addEventListener("change", () => {
+        preference = validPreference(select.value);
+        try {
+          if (preference === "system") localStorage.removeItem("theme");
+          else localStorage.setItem("theme", preference);
+        } catch { /* Keep this visit's preference when storage is unavailable. */ }
+        apply();
+      });
     });
+    apply();
   });
-  preference.addEventListener("change", () => {
-    if (!["light", "dark"].includes(storedTheme())) apply(preference.matches ? "dark" : "light");
+  system.addEventListener("change", apply);
+  window.addEventListener("storage", event => {
+    if (event.key === "theme" || event.key === null) {
+      preference = validPreference(event.newValue);
+      apply();
+    }
   });
 })();

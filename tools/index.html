@@ -3,38 +3,30 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Free public tools from Eastern Kentucky Digital: visual ear training for piano, guitar, violin, and mandolin, and GraphToTeX for mathematics.">
-    <title>Tools — Eastern Kentucky Digital</title>
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="Free browser tools from Eastern Kentucky Digital. Practice musical intervals on piano, guitar, violin, and mandolin.">
+    <title>Free tools — Eastern Kentucky Digital</title>
     <link rel="canonical" href="https://easternkentuckydigital.com/tools/">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="../styles.css">
     <script src="../theme.js"></script>
+    <link rel="stylesheet" href="../styles.css">
+
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <div class="page-shell">
       <header class="site-header">
         <a class="wordmark" href="../index.html">Eastern Kentucky Digital</a>
         <div class="header-actions">
-          <nav class="site-nav" aria-label="Main navigation">
-            <a href="../index.html">Home</a><a href="../work.html">Work</a><a href="./" aria-current="page">Tools</a><a href="mailto:rygrossmath@gmail.com">Contact</a>
-          </nav>
-          <button class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Switch color theme"><span class="theme-toggle-thumb" aria-hidden="true"></span></button>
+          <nav class="site-nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../work.html">Work</a><a href="./" aria-current="page">Tools</a><a href="../index.html#contact">Contact</a></nav>
+          <label class="theme-control" hidden><span>Theme</span><select data-theme-select aria-label="Color theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
         </div>
       </header>
-      <main>
-        <div class="page-intro"><h1>Tools</h1><p>A few useful things, free for anyone to use. No account needed.</p></div>
-        <article class="tool-entry">
-          <h2><a href="ear-training/">Ear training</a></h2>
-          <p>Learn to recognize musical intervals, then connect what you hear to the notes on a piano. Guitar, violin, and mandolin views are available in beta.</p>
-          <a class="tool-link" href="ear-training/">Open ear trainer →</a>
-        </article>
-        <article class="tool-entry">
-          <h2><a href="https://graphtotex.com">GraphToTeX</a></h2>
-          <p>Make graphs and commutative diagrams, work through calculations, and export figures to TikZ for your LaTeX documents.</p>
-          <a class="tool-link" href="https://graphtotex.com">Open GraphToTeX ↗</a>
-        </article>
+      <main id="main">
+        <div class="page-intro"><p class="eyebrow">Free tools</p><h1>A few useful things.</h1><p>Small tools I’ve made for anyone to use. No account needed.</p></div>
+        <article class="tool-entry"><h2><a href="ear-training/">Ear training</a></h2><p>Learn to recognize musical intervals and connect what you hear to the notes on a piano, guitar, violin, or mandolin.</p><a class="text-link" href="ear-training/">Open ear trainer <span aria-hidden="true">→</span></a></article>
       </main>
     </div>
-    <footer class="site-footer"><p><a href="../index.html">Eastern Kentucky Digital</a> · <a href="mailto:rygrossmath@gmail.com">Get in touch</a></p></footer>
+    <footer class="site-footer"><p>&copy; 2026 Eastern Kentucky Digital · By Ryland Gross</p><a href="../index.html#contact">Get in touch</a></footer>
   </body>
 </html>
