@@ -8,25 +8,38 @@
     <link rel="canonical" href="https://easternkentuckydigital.com/">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
+    <script src="theme.js"></script>
   </head>
   <body>
     <div class="page-shell">
       <header class="site-header">
         <a class="wordmark" href="index.html">Eastern Kentucky Digital</a>
-        <nav class="site-nav" aria-label="Main navigation">
+        <div class="header-actions"><nav class="site-nav" aria-label="Main navigation">
           <a href="index.html" aria-current="page">Home</a>
           <a href="work.html">Work</a>
+          <a href="tools/">Tools</a>
           <a href="mailto:rygrossmath@gmail.com">Contact</a>
-        </nav>
+        </nav><button class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Switch color theme"><span class="theme-toggle-thumb" aria-hidden="true"></span></button></div>
       </header>
-      <main class="home-layout">
-        <section class="intro" aria-labelledby="intro-title">
-          <p>Eastern Kentucky Digital builds clear, reliable websites for businesses, nonprofits, professionals, and community projects.</p>
-          <p>We can also handle hosting, updates, troubleshooting, and the practical computer problems that tend to get in the way.</p>
+      <main>
+        <section class="intro" aria-label="About Eastern Kentucky Digital">
+          <p>Websites, software, and practical computer help, by <a href="https://rylandgross.com">Ryland Gross</a>.</p>
+          <p>I work with small businesses, nonprofits, and individuals, from a simple website to hosting, updates, and custom tools.</p>
           <dl class="contact-list">
             <div><dt>Email</dt><dd><a href="mailto:rygrossmath@gmail.com">rygrossmath[at]gmail.com</a></dd></div>
-            <div><dt>Work</dt><dd><a href="work.html">Selected projects and software</a></dd></div>
           </dl>
+        </section>
+        <section class="home-section" aria-labelledby="tools-title">
+          <h2 id="tools-title"><a href="tools/">Tools</a></h2>
+          <ul class="link-list">
+            <li><a href="tools/ear-training/">Ear training</a> <span>— hear intervals, then see them on your instrument.</span></li>
+            <li><a href="https://graphtotex.com">GraphToTeX</a> <span>— graphing and diagrams with TikZ export.</span></li>
+          </ul>
+          <p class="small-note">Free to use. No account needed.</p>
+        </section>
+        <section class="home-section" aria-labelledby="work-title">
+          <h2 id="work-title"><a href="work.html">Selected work</a></h2>
+          <p>Websites for local businesses, community projects, and independent software.</p>
         </section>
       </main>
     </div>

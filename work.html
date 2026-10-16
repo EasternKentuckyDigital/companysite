@@ -8,19 +8,26 @@
     <link rel="canonical" href="https://easternkentuckydigital.com/work.html">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
+    <script src="theme.js"></script>
   </head>
   <body>
     <div class="page-shell">
       <header class="site-header">
         <a class="wordmark" href="index.html">Eastern Kentucky Digital</a>
-        <nav class="site-nav" aria-label="Main navigation">
+        <div class="header-actions"><nav class="site-nav" aria-label="Main navigation">
           <a href="index.html">Home</a>
           <a href="work.html" aria-current="page">Work</a>
+          <a href="tools/">Tools</a>
           <a href="mailto:rygrossmath@gmail.com">Contact</a>
-        </nav>
+        </nav><button class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Switch color theme"><span class="theme-toggle-thumb" aria-hidden="true"></span></button></div>
       </header>
       <main>
+        <h1>Selected work</h1>
         <section class="projects-list" aria-label="Selected projects">
+          <article class="project">
+            <div><h2><a href="https://graphtotex.com">GraphToTeX</a></h2><p class="project-meta">Mathematics software</p></div>
+            <p>Graphing, commutative diagrams, and mathematical tools with TikZ and LaTeX export.</p>
+          </article>
           <article class="project">
             <div><h2><a href="https://kragonauto.com" target="_blank" rel="noreferrer">KragonAuto.com</a></h2><p class="project-meta">Automotive inventory</p></div>
             <p>A straightforward inventory site for a used car dealer, with vehicle detail pages and photos.</p>

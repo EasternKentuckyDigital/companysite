@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Free interval ear training with a two-octave piano and beta guitar, violin, and mandolin visualizations. Hear an interval, identify it, and see the notes. No account needed.">
+  <title>Ear training — Eastern Kentucky Digital</title>
+  <link rel="canonical" href="https://easternkentuckydigital.com/tools/ear-training/">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    try { const t = localStorage.getItem('theme'); document.documentElement.dataset.theme = ['light', 'dark'].includes(t) ? t : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+    catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+  </script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="wordmark" href="../../index.html">Eastern Kentucky Digital</a>
+      <div class="header-actions">
+        <nav aria-label="Main navigation"><a href="../../index.html">Home</a><a href="../../work.html">Work</a><a href="../" aria-current="page">Tools</a><a href="mailto:rygrossmath@gmail.com">Contact</a></nav>
+        <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Switch color theme"><span aria-hidden="true"></span></button>
+      </div>
+    </header>
+    <main>
+      <div class="page-heading">
+        <p class="breadcrumb"><a href="../">Tools</a> <span aria-hidden="true">/</span> Music</p>
+        <h1>Ear training</h1>
+        <p>Hear an interval. Identify it. See the notes on your instrument.</p>
+      </div>
+
+      <details id="settings" class="settings">
+        <summary>Practice settings <span id="settings-description">Four intervals · ascending · 20 questions</span></summary>
+        <form id="settings-form">
+          <div class="settings-grid">
+            <label>Intervals<select id="preset"><option value="beginner">Start with four</option><option value="core">Core intervals</option><option value="all">All 12 intervals</option><option value="custom">Custom selection</option></select></label>
+            <label>Playback<select id="mode"><option value="ascending">Ascending</option><option value="descending">Descending</option><option value="mixed">Ascending &amp; descending</option><option value="harmonic">Together (harmonic)</option></select></label>
+            <label>Session<select id="count"><option value="10">10 questions</option><option value="20" selected>20 questions</option><option value="50">50 questions</option><option value="0">Unlimited</option></select></label>
+            <label>Speed<select id="speed"><option value="slow">Slow</option><option value="normal" selected>Normal</option><option value="fast">Fast</option></select></label>
+          </div>
+          <fieldset class="interval-options"><legend>Choose intervals</legend><div id="interval-options"></div></fieldset>
+          <div class="settings-checks"><label><input type="checkbox" id="fixed-root"> Keep the lower note at G3</label><label><input type="checkbox" id="auto-next"> Auto advance after 4 seconds</label></div>
+          <div class="settings-footer"><p id="settings-note">Settings are saved in this browser.</p><button class="button" type="submit" id="apply-settings">Apply settings</button></div>
+          <p id="settings-error" role="alert" hidden></p>
+        </form>
+      </details>
+
+      <section class="trainer" aria-label="Interval practice">
+        <div class="session-bar"><span id="question-count">Ready when you are</span><div class="session-score"><span id="score">0 / 0 first try</span><span id="streak">0 streak</span></div></div>
+        <div class="progress-track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><span id="progress-fill"></span></div>
+        <div id="quiz">
+          <div class="playback-controls">
+            <button id="primary" class="button primary" type="button"><span class="play-icon" aria-hidden="true">▶</span><span id="primary-label">Start practice</span></button>
+            <button id="replay" class="button" type="button" disabled>Replay <kbd>R</kbd></button>
+            <button id="reveal" class="text-button" type="button" disabled>Reveal answer</button>
+            <label class="volume-control"><span>Volume</span><input id="volume" type="range" min="0" max="100" value="60" aria-label="Volume"></label>
+          </div>
+          <div id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">Start practice to hear two notes, then choose the interval.</div>
+          <div id="answers" class="answers" role="group" aria-label="Choose the interval"></div>
+        </div>
+        <div id="summary" class="summary" hidden>
+          <h2>Session complete</h2><p id="summary-copy"></p>
+          <div class="results-scroll"><table><caption>Accuracy on the first try</caption><thead><tr><th scope="col">Interval</th><th scope="col">Correct</th><th scope="col">Accuracy</th></tr></thead><tbody id="results-body"></tbody></table></div>
+          <div class="summary-actions"><button id="restart" class="button primary" type="button">Practice again</button><button id="practice-missed" class="button" type="button" hidden>Practice missed intervals</button></div>
+        </div>
+        <div class="instrument-section">
+          <div class="instrument-heading"><h2 id="instrument-title">On the piano</h2><div class="instrument-tabs" role="group" aria-label="Instrument visualization"><button type="button" data-instrument="piano" aria-pressed="true">Piano</button><button type="button" data-instrument="guitar" aria-pressed="false">Guitar <small>beta</small></button><button type="button" data-instrument="violin" aria-pressed="false">Violin <small>beta</small></button><button type="button" data-instrument="mandolin" aria-pressed="false">Mandolin <small>beta</small></button></div></div>
+          <div class="visual-caption"><p id="visual-explanation">The notes appear after a correct answer or reveal.</p><div id="note-legend" class="note-legend" hidden><span><i class="first-dot"></i><span id="first-note"></span></span><span><i class="second-dot"></i><span id="second-note"></span></span></div></div>
+          <div id="instrument" class="instrument" aria-label="Instrument visualization"></div>
+          <div class="instrument-footer"><span id="instrument-note">Two octaves · C3–C5 · 25 keys</span><button id="replay-slow" class="text-button" type="button" hidden>Hear slowly</button></div>
+        </div>
+        <div class="session-footer"><span><kbd>Space</kbd> start / next &nbsp; <kbd>R</kbd> replay &nbsp; <kbd>1</kbd>–<kbd id="last-shortcut">4</kbd> answer</span><button id="end-session" class="text-button" type="button" hidden>End session</button></div>
+      </section>
+      <details class="help"><summary>How to practice</summary><p>Listen to the distance between the notes, then choose its name. Start with four intervals and add more in Practice settings when you feel comfortable. All notes use the same piano sound so you can focus on pitch.</p><p>A correct answer reveals both notes. Click the keyboard or highlighted string positions to play them, or choose Hear slowly. Wrong guesses let you try again; your score counts answers on the first try. Revealed answers count as missed.</p><p>Each view shows the exact pitches you heard. Guitar uses standard E–A–D–G–B–E tuning; violin and mandolin use G–D–A–E. On violin, dashed lines are semitone guides on an unfretted fingerboard.</p><p>Inspired by the interval exercises at <a href="https://tonedear.com/ear-training/intervals" target="_blank" rel="noreferrer">TonedEar</a>. A few minutes of regular practice goes a long way.</p></details>
+      <noscript><p class="no-script">JavaScript is needed to play audio and run this ear trainer. Please enable it in your browser.</p></noscript>
+    </main>
+    <footer class="site-footer"><span>Free to use. No account needed.</span><a href="../../index.html">Eastern Kentucky Digital</a></footer>
+  </div>
+</body>
+</html>
