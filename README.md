@@ -9,7 +9,8 @@ Static website and public browser tools for Eastern Kentucky Digital. No build s
 - `tools/index.html` - public tools directory
 - `tools/ear-training/` - interval ear trainer, audio engine, and instrument views
 - `styles.css` - shared typography, layout, and light/dark colors
-- `theme.js` - shared System / Light / Dark preference with live system detection
+- `theme.js` - shared light/dark switch, with a saved preference and system detection
+- `assets/fonts/` - locally hosted Manrope and Space Grotesk fonts and their open source licenses
 - `contact.js` - email reveal after a visitor clicks, with an obfuscated address
 - `favicon.svg` - local tab icon
 - `sitemap.xml` - canonical page list for search engines
@@ -34,6 +35,7 @@ Open `http://127.0.0.1:8000/` for the site, or `http://127.0.0.1:8000/tools/ear-
 - First-try accuracy, streaks, session summaries, and focused practice on missed intervals. Wrong guesses allow another attempt; revealed answers count as missed.
 - Settings stay in local storage on the current device. The quiz and its scores work without storage; there is no server tracking.
 - Web Audio plays locally hosted CC0 recordings of the selected piano, classical guitar, violin, or mandolin. The 45 WAV files total about 4 MB and load on demand. See `tools/ear-training/samples/README.md`, `sources.json`, and `CC0-1.0.txt` for creators, licenses, processing, and exact provenance. Playback starts after a user gesture.
+- Choose the instrument above the playback controls. Preview its recorded middle C before a question, or follow its recording-source link. The same selected instrument plays the quiz, demonstrations, and individual notes; previews are disabled during a question.
 - Answers trigger a slow demonstration synchronized with the notes. Solid fretboard markers show one suggested playable path; outlined markers preserve alternate positions. Click either note to hear it separately.
 
 Questions use G3–C5 so both notes have playable positions in every instrument view. The piano displays the surrounding C3–C5 range. The keyboard uses chromatic sharp note labels; enharmonic spellings are equivalent in this equal-tempered exercise. The selected root anchors the lower note, so descending intervals begin on the upper note. Root choices run from G3 through middle C, or vary across the shared range. Suggested string positions are examples rather than instrument-specific fingering lessons.

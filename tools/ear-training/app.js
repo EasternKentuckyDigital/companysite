@@ -115,6 +115,7 @@ function renderProgress() {
   else $('question-count').textContent = `Question ${session.answered + (phase === 'asking' ? 1 : 0)}${settings.count ? ` of ${settings.count}` : ''}`;
 }
 function renderControls() {
+  $('preview-instrument').disabled = phase === 'asking' || playing;
   $('primary-label').textContent = phase === 'ready' ? 'Start practice' : phase === 'asking' ? (playing ? 'Playing…' : 'Hear again') : settings.count && session.answered >= settings.count ? 'See results' : 'Next interval';
   $('primary').disabled = phase === 'asking' && playing;
   $('replay').disabled = !question || playing;
@@ -256,6 +257,15 @@ function renderStrings() {
 }
 function renderInstrument() {
   const instrument = settings.instrument;
+  const recording = SAMPLE_INSTRUMENTS[instrument];
+  $('sample-source').href = recording.source;
+  $('sample-source').title = recording.credit;
+  $('sample-source').setAttribute('aria-label', `${recording.name} recording source: ${recording.credit}`);
+  $('sample-source').replaceChildren(document.createTextNode(`${recording.name} recordings `));
+  const sourceArrow = document.createElement('span');
+  sourceArrow.setAttribute('aria-hidden', 'true');
+  sourceArrow.textContent = '↗';
+  $('sample-source').append(sourceArrow);
   document.querySelectorAll('[data-instrument]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.instrument === instrument)));
   $('instrument-title').textContent = `On the ${instrument}`;
   const visible = question && (phase === 'answered' || phase === 'summary');
@@ -421,6 +431,7 @@ $('volume').addEventListener('input', event => {
   audio.setVolume(settings.volume);
   saveSettings();
 });
+$('preview-instrument').addEventListener('click', () => activateNote(60));
 $('preset').addEventListener('change', () => {
   const preset = PRESETS[$('preset').value];
   if (preset) document.querySelectorAll('input[name="interval"]').forEach(input => { input.checked = preset.includes(Number(input.value)); });
