@@ -192,3 +192,32 @@ th { font-weight: 500; color: var(--muted); }
   .ear-training .site-footer { padding-inline: 0; }
   .demo-interval { width: 100%; margin: 0; }
 }
+
+.ear-training .page-heading { margin-bottom: 22px; }
+.ear-training .page-heading > p:last-child { font-size: .9rem; }
+.breadcrumb { margin-bottom: 10px; }
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent); }
+.sound-picker { margin-bottom: 16px; }
+.settings { margin-bottom: 18px; }
+.settings > summary { padding-block: 10px; font-size: .88rem; }
+.settings > summary > span { margin-left: 12px; }
+.trainer { border-radius: 6px; }
+.session-bar { padding-block: 12px; }
+#quiz { padding-block: 22px; }
+.feedback { min-height: 48px; padding-block: 10px; }
+.instrument-section { padding-top: 18px; }
+.sample-status { min-height: 0; font-size: .7rem; }
+.sample-status:empty { display: none; }
+.session-footer { font-size: .68rem; }
+.session-footer > span { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.credits { margin-top: 18px; color: var(--muted); font-size: .78rem; }
+.credits summary { color: var(--ink); }
+.credits p { margin: 10px 0 0; }
+.credits a { color: inherit; }
+@media (max-width: 520px) {
+  .ear-training .page-heading { margin-bottom: 18px; }
+  .sound-picker { gap: 8px 12px; }
+  .sound-actions { gap: 4px 14px; }
+  .session-footer > span { max-width: 100%; }
+}

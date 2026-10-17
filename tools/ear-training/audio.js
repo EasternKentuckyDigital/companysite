@@ -19,14 +19,7 @@ export class InstrumentAudio {
       this.buffers.clear();
       this.output = this.context.createGain();
       this.output.gain.value = this.volume * .85;
-      this.compressor = this.context.createDynamicsCompressor();
-      this.compressor.threshold.value = -6;
-      this.compressor.knee.value = 6;
-      this.compressor.ratio.value = 3;
-      this.compressor.attack.value = .003;
-      this.compressor.release.value = .12;
-      this.output.connect(this.compressor);
-      this.compressor.connect(this.context.destination);
+      this.output.connect(this.context.destination);
     }
     if (this.context.state !== 'running') await this.context.resume();
     if (this.context.state !== 'running') throw new Error('Audio is paused by your browser. Press Replay to try again.');
@@ -41,9 +34,15 @@ export class InstrumentAudio {
     const sample = sampleFor(instrument, midi);
     if (!this.buffers.has(sample.url)) {
       const pending = (async () => {
-        const response = await fetch(sample.url, { signal: AbortSignal.timeout(15000) });
-        if (!response.ok) throw new Error('Recording download failed.');
-        return this.context.decodeAudioData(await response.arrayBuffer());
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        try {
+          const response = await fetch(sample.url, { signal: controller.signal });
+          if (!response.ok) throw new Error('Recording download failed.');
+          return await this.context.decodeAudioData(await response.arrayBuffer());
+        } finally {
+          clearTimeout(timeout);
+        }
       })().catch(() => {
         this.buffers.delete(sample.url);
         throw new Error('Couldn’t load the instrument recording. Check your connection and press Replay to try again.');
@@ -67,14 +66,15 @@ export class InstrumentAudio {
 
   tone(recording, start, level = 1) {
     const { buffer, rate } = recording;
-    const duration = Math.min(buffer.duration / rate, 1.65);
+    // Keep most of the recorded decay so plucked and struck notes stay natural.
+    const duration = Math.min(buffer.duration / rate, 2.4);
     const source = this.context.createBufferSource();
     const envelope = this.context.createGain();
     source.buffer = buffer;
     source.playbackRate.value = rate;
     envelope.gain.setValueAtTime(0, start);
     envelope.gain.linearRampToValueAtTime(level, start + .004);
-    envelope.gain.setValueAtTime(level, start + Math.max(.005, duration - .09));
+    envelope.gain.setValueAtTime(level, start + Math.max(.005, duration - .16));
     envelope.gain.linearRampToValueAtTime(0, start + duration);
     source.connect(envelope);
     envelope.connect(this.output);

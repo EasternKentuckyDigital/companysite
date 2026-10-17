@@ -11,7 +11,7 @@ Static website and public browser tools for Eastern Kentucky Digital. No build s
 - `styles.css` - shared typography, layout, and light/dark colors
 - `theme.js` - shared light/dark switch, with a saved preference and system detection
 - `assets/fonts/` - locally hosted Manrope and Space Grotesk fonts and their open source licenses
-- `contact.js` - email reveal after a visitor clicks, with an obfuscated address
+- `contact.js` - reveals the plain-text email address after a visitor clicks
 - `favicon.svg` - local tab icon
 - `sitemap.xml` - canonical page list for search engines
 - `robots.txt` - crawler guidance and sitemap location
@@ -54,4 +54,4 @@ For a different domain, update the canonical URLs, `sitemap.xml`, and `robots.tx
 
 ## Contact privacy
 
-Contact links lead to the homepage contact section. The email address is absent from HTML, metadata, and initial DOM; `contact.js` reconstructs a clickable address only after the visitor requests it. This deters basic scrapers, but client-side obfuscation cannot prevent a determined crawler from executing the same interaction. A server-side contact form would be needed to keep the destination address entirely off the client. No backend or third-party form service is used.
+The email address is absent from HTML, metadata, and the initial DOM; `contact.js` reveals it as plain text after the visitor requests it. This deters basic scrapers, but client-side obfuscation cannot prevent a determined crawler from executing the same interaction. A server-side contact form would be needed to keep the address entirely off the client. No backend or third-party form service is used.

@@ -43,8 +43,8 @@ function stopPlayback() {
   playing = false;
 }
 function updateSettingsDescription() {
-  const modes = { ascending: 'ascending', descending: 'descending', mixed: 'both directions', harmonic: 'together' };
-  $('settings-description').textContent = `${settings.intervals.length} intervals · ${settings.rootNote === null ? 'varied roots' : noteName(settings.rootNote)} · ${modes[settings.mode]} · ${settings.count ? `${settings.count} questions` : 'unlimited'}`;
+  const modes = { ascending: 'ascending', descending: 'descending', mixed: 'mixed', harmonic: 'together' };
+  $('settings-description').textContent = `${settings.intervals.length} intervals · ${settings.rootNote === null ? 'varied' : noteName(settings.rootNote)} · ${modes[settings.mode]}`;
   $('apply-settings').textContent = phase === 'asking' || phase === 'answered' ? 'Apply & restart session' : 'Apply settings';
 }
 function fillSettings() {
@@ -79,7 +79,7 @@ function renderAnswers() {
     short.className = 'interval-short';
     short.textContent = interval.short;
     const shortcut = document.createElement('kbd');
-    shortcut.textContent = index < 9 ? index + 1 : ['0', '−', '='][index - 9];
+    shortcut.textContent = index < 9 ? index + 1 : ['0', '-', '='][index - 9];
     shortcut.setAttribute('aria-hidden', 'true');
     button.append(name, short, shortcut);
     if (attempted.has(semitones)) {
@@ -93,7 +93,9 @@ function renderAnswers() {
     button.addEventListener('click', () => answer(semitones));
     return button;
   }));
-  $('last-shortcut').textContent = settings.intervals.length <= 9 ? settings.intervals.length : '=';
+  $('answer-shortcut-hint').textContent = settings.intervals.length <= 9
+    ? `Keys 1–${settings.intervals.length}`
+    : 'Keys 1–9, 0, -, =';
 }
 function renderProgress() {
   const percent = settings.count ? session.answered / settings.count * 100 : 0;
@@ -108,9 +110,9 @@ function renderProgress() {
     progress.removeAttribute('aria-valuemax');
     progress.setAttribute('aria-valuetext', `${session.answered} questions completed, unlimited session`);
   }
-  $('score').textContent = `${session.correct} / ${session.answered} first try`;
+  $('score').textContent = `${session.correct}/${session.answered} first try`;
   $('streak').textContent = `${session.streak} streak`;
-  if (phase === 'ready') $('question-count').textContent = 'Ready when you are';
+  if (phase === 'ready') $('question-count').textContent = 'Ready';
   else if (phase === 'summary') $('question-count').textContent = `${session.answered} questions completed`;
   else $('question-count').textContent = `Question ${session.answered + (phase === 'asking' ? 1 : 0)}${settings.count ? ` of ${settings.count}` : ''}`;
 }
@@ -123,7 +125,7 @@ function renderControls() {
   $('replay-slow').hidden = phase !== 'answered' && !(phase === 'summary' && question);
   $('replay-slow').disabled = playing;
   $('end-session').hidden = phase === 'ready' || phase === 'summary';
-  $('settings-note').textContent = phase === 'asking' || phase === 'answered' ? 'Applying changes starts a new session.' : 'Settings are saved in this browser.';
+  $('settings-note').textContent = phase === 'asking' || phase === 'answered' ? 'Changes restart this session.' : 'Saved on this device.';
   updateSettingsDescription();
 }
 function noteRole(midi) {
@@ -141,7 +143,7 @@ async function activateNote(midi) {
   try {
     const result = await audio.playNote(midi, settings.instrument);
     if (token !== audioToken || !result) return;
-    $('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
+    $('sample-status').textContent = '';
     animateNote(midi, result.delay * 1000, token, result.duration * 1000);
     animationTimers.push(setTimeout(() => {
       if (token !== audioToken) return;
@@ -261,13 +263,13 @@ function renderInstrument() {
   $('sample-source').href = recording.source;
   $('sample-source').title = recording.credit;
   $('sample-source').setAttribute('aria-label', `${recording.name} recording source: ${recording.credit}`);
-  $('sample-source').replaceChildren(document.createTextNode(`${recording.name} recordings `));
+  $('sample-source').replaceChildren(document.createTextNode('Audio source '));
   const sourceArrow = document.createElement('span');
   sourceArrow.setAttribute('aria-hidden', 'true');
   sourceArrow.textContent = '↗';
   $('sample-source').append(sourceArrow);
   document.querySelectorAll('[data-instrument]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.instrument === instrument)));
-  $('instrument-title').textContent = `On the ${instrument}`;
+  $('instrument-title').textContent = instrument[0].toUpperCase() + instrument.slice(1);
   const visible = question && (phase === 'answered' || phase === 'summary');
   $('note-legend').hidden = !visible;
   $('demonstration').hidden = !visible;
@@ -283,17 +285,17 @@ function renderInstrument() {
     }
     $('demo-direction').textContent = together ? '+' : '→';
     $('demo-interval').textContent = `${intervalBy(question.semitones).name} · ${question.semitones} semitones`;
-    $('fingering-guide').textContent = instrument === 'piano' ? 'Follow the highlighted keys, or select either note to hear it again.'
-      : path.map((position, index) => `${index + 1}: ${noteName(INSTRUMENTS[instrument].tuning[position.string])} string, ${position.fret === 0 ? 'open' : `${INSTRUMENTS[instrument].fretless ? 'position' : 'fret'} ${position.fret}`}`).join(' → ') + '. Solid markers show this path; outlined markers are alternatives.';
+    $('fingering-guide').textContent = instrument === 'piano' ? 'Select either note to hear it again.'
+      : path.map(position => `${noteName(INSTRUMENTS[instrument].tuning[position.string])} string · ${position.fret === 0 ? 'open' : `${INSTRUMENTS[instrument].fretless ? 'position' : 'fret'} ${position.fret}`}`).join(' → ');
     $('visual-explanation').textContent = `${question.notes.map(noteName).join(together ? ' + ' : ' → ')} · ${question.semitones} semitone${question.semitones === 1 ? '' : 's'}`;
   } else {
-    $('visual-explanation').textContent = 'The notes appear after a correct answer or reveal.';
+    $('visual-explanation').textContent = 'Notes appear after you answer.';
   }
   $('instrument-note').textContent = {
-    piano: 'Two octaves · C3–C5 · 25 keys',
-    guitar: 'Standard E–A–D–G–B–E · 12 frets · high E at top',
-    violin: 'G–D–A–E · dashed semitone guides, no frets',
-    mandolin: 'G–D–A–E · four pairs of strings · 12 frets',
+    piano: 'C3–C5',
+    guitar: 'E–A–D–G–B–E',
+    violin: 'G–D–A–E',
+    mandolin: 'G–D–A–E · paired strings',
   }[instrument];
   if (instrument === 'piano') renderPiano(); else renderStrings();
 }
@@ -329,8 +331,8 @@ async function playQuestion(speed = settings.speed) {
     const result = await audio.play(currentQuestion, speed, settings.instrument);
     if (token !== audioToken || !result) return;
     playbackFailed = false;
-    $('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
-    if (phase === 'asking') feedback('Which interval did you hear?');
+    $('sample-status').textContent = '';
+    if (phase === 'asking') feedback('Name the interval.');
     if (phase === 'answered' || phase === 'summary') {
       animateNote(currentQuestion.notes[0], result.delay * 1000, token, result.durations[0] * 1000);
       animateNote(currentQuestion.notes[1], (result.delay + result.gap) * 1000, token, result.durations[1] * 1000);
@@ -379,7 +381,7 @@ function answer(semitones, reveal = false) {
     missed = true;
     session.streak = 0;
     attempted.add(semitones);
-    feedback(`${intervalBy(semitones).name} — try again. You can replay the notes.`, 'missed');
+    feedback(`${intervalBy(semitones).name} · try again`, 'missed');
     renderAnswers();
     renderProgress();
     return;
@@ -388,7 +390,7 @@ function answer(semitones, reveal = false) {
   recordResult(session, question.semitones, !missed && !reveal);
   const name = intervalBy(question.semitones).name;
   const mode = { ascending: 'ascending', descending: 'descending', harmonic: 'together' }[question.mode];
-  feedback(reveal ? `${name} (${mode}). Listen again and compare the notes below.` : `${missed ? 'That’s it' : 'Correct'} — ${name.toLowerCase()} (${mode}).`, reveal ? '' : 'success');
+  feedback(reveal ? `${name} · ${mode}` : `Correct · ${name.toLowerCase()} (${mode})`, reveal ? '' : 'success');
   render();
   playQuestion('slow');
 }
@@ -469,7 +471,7 @@ document.querySelectorAll('[data-instrument]').forEach(button => button.addEvent
   renderInstrument();
   renderControls();
   if (question) playQuestion(phase === 'asking' ? settings.speed : 'slow');
-  else $('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
+  else $('sample-status').textContent = '';
 }));
 for (const id of ['demo-first', 'demo-second']) $(id).addEventListener('click', () => activateNote(Number($(id).dataset.midi)));
 
@@ -490,6 +492,6 @@ document.addEventListener('keydown', event => {
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { clearAuto(); stopPlayback(); renderControls(); renderAnswers(); } });
 window.addEventListener('pagehide', () => { clearAuto(); stopPlayback(); });
-$('sample-status').textContent = `${SAMPLE_INSTRUMENTS[settings.instrument].name} · recorded instrument`;
+$('sample-status').textContent = '';
 fillSettings();
 render();

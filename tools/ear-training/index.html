@@ -25,18 +25,18 @@
     </header>
     <main id="main">
       <div class="page-heading">
-        <p class="breadcrumb"><a href="../">Tools</a> <span aria-hidden="true">/</span> Music</p>
+        <p class="breadcrumb"><a href="../">← Tools</a></p>
         <h1>Ear training</h1>
-        <p>Hear an interval. Find it on your instrument.</p>
+        <p>Listen. Name the interval.</p>
       </div>
 
       <div class="sound-picker">
         <div class="instrument-tabs" role="group" aria-label="Instrument sound"><button type="button" data-instrument="piano" aria-pressed="true">Piano</button><button type="button" data-instrument="guitar" aria-pressed="false">Guitar</button><button type="button" data-instrument="violin" aria-pressed="false">Violin</button><button type="button" data-instrument="mandolin" aria-pressed="false">Mandolin</button></div>
-        <div class="sound-actions"><button id="preview-instrument" class="text-button" type="button">Preview sound</button><a class="recording-source" id="sample-source" href="https://versilian-studios.com/vcsl/" target="_blank" rel="noreferrer">Piano recordings <span aria-hidden="true">↗</span></a></div>
+        <div class="sound-actions"><button id="preview-instrument" class="text-button" type="button">Preview</button><a class="recording-source" id="sample-source" href="https://versilian-studios.com/vcsl/" target="_blank" rel="noreferrer">Audio source <span aria-hidden="true">↗</span></a></div>
       </div>
 
       <details id="settings" class="settings">
-        <summary>Practice settings <span id="settings-description">Four intervals · ascending · 20 questions</span></summary>
+        <summary>Settings <span id="settings-description">4 intervals · C4 · ascending</span></summary>
         <form id="settings-form">
           <div class="settings-grid">
             <label>Intervals<select id="preset"><option value="beginner">Start with four</option><option value="core">Core intervals</option><option value="all">All 12 intervals</option><option value="custom">Custom selection</option></select></label>
@@ -53,7 +53,7 @@
       </details>
 
       <section class="trainer" aria-label="Interval practice">
-        <div class="session-bar"><span id="question-count">Ready when you are</span><div class="session-score"><span id="score">0 / 0 first try</span><span id="streak">0 streak</span></div></div>
+          <div class="session-bar"><span id="question-count">Ready</span><div class="session-score"><span id="score">0/0 first try</span><span id="streak">0 streak</span></div></div>
         <div class="progress-track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><span id="progress-fill"></span></div>
         <div id="quiz">
           <div class="playback-controls">
@@ -62,7 +62,7 @@
             <button id="reveal" class="text-button" type="button" disabled>Reveal answer</button>
             <label class="volume-control"><span>Volume</span><input id="volume" type="range" min="0" max="100" value="80" aria-label="Volume"></label>
           </div>
-          <div id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">Start practice to hear two notes, then choose the interval.</div>
+          <div id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">Press start to hear an interval.</div>
           <div id="answers" class="answers" role="group" aria-label="Choose the interval"></div>
         </div>
         <div id="summary" class="summary" hidden>
@@ -71,23 +71,23 @@
           <div class="summary-actions"><button id="restart" class="button primary" type="button">Practice again</button><button id="practice-missed" class="button" type="button" hidden>Practice missed intervals</button></div>
         </div>
         <div class="instrument-section">
-          <div class="instrument-heading"><h2 id="instrument-title">On the piano</h2></div>
-          <div class="visual-caption"><p id="visual-explanation">The notes appear after a correct answer or reveal.</p><div id="note-legend" class="note-legend" hidden><span><i class="first-dot"></i><span id="first-note"></span></span><span><i class="second-dot"></i><span id="second-note"></span></span></div></div>
+          <div class="instrument-heading"><h2 id="instrument-title">Piano</h2></div>
+          <div class="visual-caption"><p id="visual-explanation">Notes appear after you answer.</p><div id="note-legend" class="note-legend" hidden><span><i class="first-dot"></i><span id="first-note"></span></span><span><i class="second-dot"></i><span id="second-note"></span></span></div></div>
           <div id="instrument" class="instrument" aria-label="Instrument visualization"></div>
           <div id="demonstration" class="demonstration" hidden>
             <div class="demonstration-steps"><button type="button" id="demo-first" class="note-step"></button><span id="demo-direction" aria-hidden="true">→</span><button type="button" id="demo-second" class="note-step"></button><span id="demo-interval" class="demo-interval"></span></div>
             <p id="fingering-guide"></p>
           </div>
-          <div class="instrument-footer"><span id="instrument-note">Two octaves · C3–C5 · 25 keys</span><button id="replay-slow" class="text-button" type="button" hidden>Play demonstration slowly</button></div>
+          <div class="instrument-footer"><span id="instrument-note">C3–C5</span><button id="replay-slow" class="text-button" type="button" hidden>Slow replay</button></div>
           <p id="sample-status" class="sample-status" role="status" aria-live="polite"></p>
         </div>
-        <div class="session-footer"><span><kbd>Space</kbd> start / next &nbsp; <kbd>R</kbd> replay &nbsp; <kbd>1</kbd>–<kbd id="last-shortcut">4</kbd> answer</span><button id="end-session" class="text-button" type="button" hidden>End session</button></div>
+        <div class="session-footer"><span><kbd>Space</kbd> start / next · <kbd>R</kbd> replay · <span id="answer-shortcut-hint">Keys 1–4</span></span><button id="end-session" class="text-button" type="button" hidden>End session</button></div>
       </section>
-      <details class="help"><summary>How to practice</summary><p>Listen to the distance between the notes, then choose its name. Middle C is the default root. Change Root note in Practice settings to choose another anchor or vary the notes.</p><p>Each instrument uses recordings of that instrument. Select the instrument you want to hear before starting, or switch during practice to compare the same interval.</p><p>A correct answer or reveal plays a slow demonstration, with each note lighting up as it sounds. On strings, solid markers show one suggested playable path; outlined markers show other places to find the same pitches. Click a note to hear it on its own.</p><p>Wrong guesses let you try again; your score counts answers on the first try. Revealed answers count as missed. Guitar uses E–A–D–G–B–E tuning; violin and mandolin use G–D–A–E. Violin’s dashed lines are semitone guides rather than frets.</p><p id="audio-credits">Public-domain (CC0) recordings: <a href="https://versilian-studios.com/vcsl/">Kawai piano</a> and <a href="https://versilian-studios.com/vsco-community/">violin</a> by Versilian Studios, <a href="https://freepats.zenvoid.org/Guitar/acoustic-guitar.html">classical guitar</a> by Roberto / FreePats, and <a href="https://freesound.org/people/Taku19810729/sounds/255837/">mandolin</a> by Taku19810729.</p><p>Inspired by <a href="https://tonedear.com/ear-training/intervals" target="_blank" rel="noreferrer">TonedEar</a>.</p></details>
-      <noscript><p class="no-script">JavaScript is needed to play audio and run this ear trainer. Please enable it in your browser.</p></noscript>
+      <details class="credits"><summary>Audio credits</summary><p id="audio-credits">CC0 recordings: <a href="https://versilian-studios.com/vcsl/">Piano</a> and <a href="https://versilian-studios.com/vsco-community/">violin</a> by Versilian Studios, <a href="https://freepats.zenvoid.org/Guitar/acoustic-guitar.html">guitar</a> by Roberto / FreePats, and <a href="https://freesound.org/people/Taku19810729/sounds/255837/">mandolin</a> by Taku19810729.</p></details>
+      <noscript><p class="no-script">JavaScript is required to run the trainer.</p></noscript>
     </main>
     <footer class="site-footer">
-      <span>Free to use. No account needed.</span>
+      <span>&copy; 2026 Eastern Kentucky Digital</span>
     </footer>
   </div>
 </body>
